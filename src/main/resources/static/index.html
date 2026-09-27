@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Alışveriş Sepeti Yönetimi</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: auto; }
+        h2, h3 { color: #333; }
+        .form-group { margin-bottom: 15px; }
+        input { padding: 8px; width: calc(50% - 12px); margin-right: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .single-input { width: calc(70% - 12px); }
+        button { padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        .delete-btn { background-color: #dc3545; }
+        .delete-btn:hover { background-color: #c82333; }
+        .check-btn { background-color: #17a2b8; }
+        .check-btn:hover { background-color: #138496; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        #checkResult { margin-top: 10px; font-weight: bold; color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🛒 Alışveriş Sepeti Yönetim Paneli</h2>
+
+    <!-- Ürün Ekleme Formu -->
+    <div class="form-group">
+        <h3>Ürün Ekle</h3>
+        <input type="text" id="productName" placeholder="Ürün Adı">
+        <input type="number" id="productPrice" placeholder="Fiyatı">
+        <button onclick="addProduct()">Sepete Ekle</button>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <!-- Ürün Sorgulama Formu -->
+    <div class="form-group">
+        <h3>Sepette Ürün Ara</h3>
+        <input type="text" id="checkName" class="single-input" placeholder="Aranacak Ürün Adı">
+        <button class="check-btn" onclick="checkProduct()">Sorgula</button>
+        <div id="checkResult"></div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <!-- Sepet Listesi -->
+    <h3>Sepettekiler</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Ürün Adı</th>
+            <th>Fiyat</th>
+            <th>İşlem</th>
+        </tr>
+        </thead>
+        <tbody id="cartTableBody">
+        <!-- Dinamik olarak dolacak -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const API_URL = '/api/cart';
+
+    // Sepeti yükle ve ekrana yaz
+    function loadCart() {
+        fetch(API_URL)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('cartTableBody');
+                tbody.innerHTML = '';
+                data.forEach(product => {
+                    const row = `<tr>
+                        <td>${product.name}</td>
+                        <td>${product.price} TL</td>
+                        <td><button class="delete-btn" onclick="removeProduct('${product.name}')">Sil</button></td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    // Sepete ürün ekle
+    function addProduct() {
+        const name = document.getElementById('productName').value;
+        const price = document.getElementById('productPrice').value;
+
+        if (!name || !price) {
+            alert('Lütfen tüm alanları doldurun!');
+            return;
+        }
+
+        fetch(API_URL + '/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, price: parseFloat(price) })
+        })
+            .then(response => response.text())
+            .then(result => {
+                document.getElementById('productName').value = '';
+                document.getElementById('productPrice').value = '';
+                loadCart();
+            });
+    }
+
+    // Ürünü sepetten sil
+    function removeProduct(name) {
+        fetch(API_URL + '/remove/' + encodeURIComponent(name), {
+            method: 'DELETE'
+        })
+            .then(response => response.text())
+            .then(result => {
+                loadCart();
+            });
+    }
+
+    // Ürün sepette var mı kontrol et
+    function checkProduct() {
+        const name = document.getElementById('checkName').value;
+        const resultDiv = document.getElementById('checkResult');
+
+        if (!name) {
+            alert('Lütfen aranacak ürün adını yazın!');
+            return;
+        }
+
+        fetch(API_URL + '/check/' + encodeURIComponent(name))
+            .then(response => response.text())
+            .then(result => {
+                resultDiv.innerText = result;
+            });
+    }
+
+    // Sayfa açıldığında sepeti getir
+    window.onload = loadCart;
+</script>
+
+</body>
+</html>

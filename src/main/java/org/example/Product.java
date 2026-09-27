@@ -3,8 +3,11 @@ package org.example;
 public class Product {
     private String name;
     private double price;
+
+    public Product() {}
+
     public Product(String name, double price) {
-        this.name =name;
+        this.name = name;
         this.price = price;
     }
 
@@ -12,12 +15,15 @@ public class Product {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public double getPrice() {
         return price;
     }
 
-    @Override
-    public String toString() {
-        return name + " - " + price + " TL";
+    public void setPrice(double price) {
+        this.price = price;
     }
 }
