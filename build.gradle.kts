@@ -1,6 +1,7 @@
 plugins {
     java
     id("org.springframework.boot") version "3.2.5"
+    id("io.spring.dependency-management") version "1.1.4"
 }
 
 group = "org.example"
@@ -11,13 +12,8 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.2.5"))
     implementation("org.springframework.boot:spring-boot-starter-web")
-
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-tasks.test {
-    useJUnitPlatform()
+    // Swagger / SpringDoc UI kütüphanesi
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
