@@ -10,21 +10,22 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    // Şimdilik verileri geçici olarak bellekte (Listede) tutuyoruz
+    // Bellekte veri tutacak geçici liste
     private final List<User> userList = new ArrayList<>();
-    private long counter = 1;
+    private int counter = 1;
 
-    // 1. Kullanıcı Listeleme (GET)
+    // 1. Kullanıcı Kayıt Olma (POST) - İstediğin Endpoint
+    // Kullanıcı username ve password girer, sistem id döner.
+    @PostMapping("/register")
+    public int registerUser(@RequestBody User newUser) {
+        newUser.setId(counter++);
+        userList.add(newUser);
+        return newUser.getId(); // Yanıt olarak sadece kullanıcının ID'sini döndürür
+    }
+
+    // 2. Kullanıcıları Listeleme (GET)
     @GetMapping
     public List<User> getAllUsers() {
         return userList;
-    }
-
-    // 2. Kullanıcı Kayıt Olma (POST)
-    @PostMapping
-    public User registerUser(@RequestBody User user) {
-        user.setId(counter++);
-        userList.add(user);
-        return user;
     }
 }
