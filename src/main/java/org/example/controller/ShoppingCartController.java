@@ -1,7 +1,8 @@
 package org.example.controller;
 
-import org.example.ShoppingCart;
-import org.example.User;
+import org.example.model.ShoppingCart;
+import org.example.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,15 +17,16 @@ public class ShoppingCartController {
     private final List<ShoppingCart> cartList = new ArrayList<>();
     private int idCounter = 1;
 
+
     @PostMapping("/add")
     public ResponseEntity<?> addToCart(@RequestParam int userId, @RequestBody ShoppingCart cart) {
 
-
-        boolean isUserExists = UserController.getUserList().stream()
+        boolean isUserExists = UserRepository.getUserList().stream()
                 .anyMatch(user -> user.getId() == userId);
 
         if (!isUserExists) {
-            return ResponseEntity.badRequest().body("Hata: Kayıtlı olmayan bir kullanıcı ID'si ile sepete ürün eklenemez!");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Hata: Kayıtlı olmayan kullanıcı ID'si ile işlem yapılamaz!");
         }
 
         cart.setId(idCounter++);
