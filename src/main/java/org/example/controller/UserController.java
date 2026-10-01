@@ -1,8 +1,8 @@
 package org.example.controller;
 
-import org.example.model.User;
 import org.example.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
+import org.example.model.User;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class UserController {
     public int registerUser(@RequestBody User newUser) {
         newUser.setId(counter++);
         UserRepository.addUser(newUser);
-        return newUser.getId();
+        return Math.toIntExact(newUser.getId());
     }
 
     @GetMapping
